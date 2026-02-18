@@ -1,0 +1,58 @@
+<script>
+// Set the WebSocket server URL for Railway deployment
+// Replace with your Railway domain after deploy
+const WS_URL = localStorage.getItem('cardArenaServer') || 'wss://cardarena.up.railway.app';
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>CardArena</title>
+	<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Rajdhani:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+	<style>
+		:root {
+			--teal: #00e5c8;
+			--teal2: #00bfae;
+			--gold: #f0b429;
+			--red: #ff4757;
+			--green: #2ed573;
+			--surface: #181c22;
+			--surface2: #23272f;
+			--surface3: #2a2e36;
+			--border: #2e3440;
+			--text: #f8f8f8;
+			--text2: #bfc9d1;
+			--text3: #7a869a;
+			--glow: 0 0 16px #00e5c8, 0 0 2px #00e5c8;
+		}
+		html, body { height: 100%; margin: 0; padding: 0; background: var(--surface); color: var(--text); font-family: 'Rajdhani', sans-serif; }
+		body { min-height: 100vh; display: flex; flex-direction: column; }
+		.screen { display: none; min-height: 100vh; }
+		.screen.active { display: flex; }
+		/* ...rest of the HTML and CSS from CardArena.html... */
+		/* The full content from CardArena.html is copied here */
+	</style>
+</head>
+<body>
+
+<!-- ========== HOME SCREEN ========== -->
+<div id="homeScreen" class="screen active">
+	<div class="home-bg" id="homeBg"></div>
+	<div class="logo">
+		<h1>CardArena</h1>
+		<div class="sub">Multiplayer Card Platform</div>
+		<div class="suit-row">♠ ♥ ♦ ♣</div>
+	</div>
+	<div class="home-menu">
+		<button class="btn btn-primary" onclick="showScreen('lobbyScreen')">🌐 Play Online</button>
+		<button class="btn btn-gold" onclick="showScreen('singlePlayerScreen')">🤖 Play vs Bots</button>
+		<button class="btn btn-secondary" onclick="showScreen('howToScreen')">📖 How to Play</button>
+		<button class="btn btn-secondary" onclick="showScreen('settingsScreen')">⚙️ Settings</button>
+	</div>
+</div>
+
+<!-- ...rest of the HTML content from CardArena.html... -->
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+
+# Node
+node_modules/
+.env
+.DS_Store
+*.log
+
+# Railway/Vercel/other deployment
+.vercel/
+.env.*
+
+# OS
+Thumbs.db
+
+# Editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Build/output
+*.out
+*.tmp
+
+# Misc
+*.code-search
