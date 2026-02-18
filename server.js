@@ -5,7 +5,12 @@ const WebSocket = require('ws');
 const path = require('path');
 const PORT = process.env.PORT || 3000;
 
+
 const app = express();
+// Redirect root to /CardArena.html for user convenience
+app.get('/', (req, res) => {
+  res.redirect('/CardArena.html');
+});
 app.use(express.static(path.join(__dirname, 'public')));
 
 const server = http.createServer(app);
