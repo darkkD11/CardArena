@@ -338,8 +338,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   .bluff-btn{padding:10px 20px;font-size:0.85rem}
 }
 </style>
+<style>
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  background: #222b33;
+  color: #ffb347;
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.05rem;
+  padding: 10px 0;
+  z-index: 9999;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  letter-spacing: 0.05em;
+  display: none;
+}
+</style>
 </head>
 <body>
+<div id="offlineBanner" class="offline-banner">Disconnected from server — offline mode</div>
 
 <!-- ========== HOME SCREEN ========== -->
 <div id="homeScreen" class="screen active">
@@ -714,23 +733,54 @@ function selectDiff(d,el){
 // ============================================================
 function genRoomCode(){return Math.random().toString(36).slice(2,8).toUpperCase()}
 // WebSocket-based multiplayer client (server required at WS_URL)
+
 let ws = null;
-const WS_URL = localStorage.getItem('cardArenaServer') || 'ws://localhost:3000';
 let serverRooms = {};
+// Dynamically determine WS URL for local/dev/prod
+function getWebSocketUrl() {
+  // Allow override for debugging
+  const override = localStorage.getItem('cardArenaServer');
+  if (override) return override;
+  let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  let host = window.location.hostname;
+  let port = window.location.port;
+  // If running on Railway or similar, use same host/port as page
+  let wsUrl = protocol + '//' + host + (port ? ':' + port : '') + '/';
+  return wsUrl;
+}
+
+const WS_URL = getWebSocketUrl();
 
 function connectToServer(){
   try{
     ws = new WebSocket(WS_URL);
   }catch(e){
     toast('WebSocket init failed','red');
+    showOfflineBanner(true);
     return;
   }
-  ws.onopen = ()=>{ toast('Connected to server','green'); ws.send(JSON.stringify({type:'list_rooms'})); };
-  // identify ourselves so server can map socket -> playerId
-  ws.onopen = ()=>{ toast('Connected to server','green'); ws.send(JSON.stringify({type:'identify', payload:{playerId:myPlayerId, name:settings.name}})); ws.send(JSON.stringify({type:'list_rooms'})); };
+  ws.onopen = ()=>{
+    toast('Connected to server','green');
+    showOfflineBanner(false);
+    ws.send(JSON.stringify({type:'identify', payload:{playerId:myPlayerId, name:settings.name}}));
+    ws.send(JSON.stringify({type:'list_rooms'}));
+  };
   ws.onmessage = (ev)=>{ try{ const msg=JSON.parse(ev.data); handleServerMessage(msg);}catch(e){} };
-  ws.onclose = ()=>{ toast('Disconnected from server — offline mode','gold'); setTimeout(()=>connectToServer(),3000); };
-  ws.onerror = ()=>{ toast('WebSocket error','red'); if(ws)ws.close(); };
+  ws.onclose = ()=>{
+    toast('Disconnected from server — offline mode','gold');
+    showOfflineBanner(true);
+    setTimeout(()=>connectToServer(),3000);
+  };
+  ws.onerror = ()=>{
+    toast('WebSocket error','red');
+    showOfflineBanner(true);
+    if(ws)ws.close();
+  };
+}
+
+function showOfflineBanner(show) {
+  const banner = document.getElementById('offlineBanner');
+  if (banner) banner.style.display = show ? 'block' : 'none';
 }
 
 function handleServerMessage(msg){
