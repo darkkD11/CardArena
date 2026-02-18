@@ -750,7 +750,7 @@ function getWebSocketUrl() {
 }
 
 const WS_URL = getWebSocketUrl();
-
+console.log('Connecting to WebSocket server at', WS_URL);
 function connectToServer(){
   try{
     ws = new WebSocket(WS_URL);
