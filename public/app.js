@@ -1,634 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CardArena — Bluff</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #080b0f;
-  --surface: #0e1318;
-  --surface2: #141a22;
-  --surface3: #1a2230;
-  --teal: #00e5c8;
-  --teal2: #00b8a0;
-  --gold: #f0b429;
-  --gold2: #c9921a;
-  --red: #ff4757;
-  --green: #2ed573;
-  --text: #e8edf3;
-  --text2: #8a99ab;
-  --text3: #4a5568;
-  --border: rgba(0,229,200,0.15);
-  --glow: 0 0 20px rgba(0,229,200,0.3);
-  --gold-glow: 0 0 20px rgba(240,180,41,0.4);
-  --radius: 12px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif}
-body{background-image:radial-gradient(ellipse at 20% 20%, rgba(0,229,200,0.03) 0%, transparent 60%), radial-gradient(ellipse at 80% 80%, rgba(240,180,41,0.03) 0%, transparent 60%)}
-
-/* SCREENS */
-.screen{display:none;position:absolute;inset:0;overflow:auto}
-.screen.active{display:flex}
-
-/* ========== HOME SCREEN ========== */
-#homeScreen{flex-direction:column;align-items:center;justify-content:center;gap:0}
-.home-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-.home-bg::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 40px,rgba(0,229,200,0.02) 40px,rgba(0,229,200,0.02) 41px),repeating-linear-gradient(90deg,transparent,transparent 40px,rgba(0,229,200,0.02) 40px,rgba(0,229,200,0.02) 41px)}
-.floating-card{position:absolute;font-size:2rem;opacity:0.06;animation:floatCard 15s infinite linear;user-select:none}
-@keyframes floatCard{0%{transform:translateY(110vh) rotate(0deg)}100%{transform:translateY(-10vh) rotate(360deg)}}
-.logo{text-align:center;position:relative;z-index:1;margin-bottom:56px}
-.logo h1{font-family:'Cinzel Decorative',serif;font-size:clamp(2.5rem,7vw,5rem);font-weight:900;color:var(--teal);text-shadow:0 0 40px rgba(0,229,200,0.5),0 0 80px rgba(0,229,200,0.2);letter-spacing:0.05em;line-height:1}
-.logo .sub{font-family:'Rajdhani',sans-serif;font-size:1.1rem;letter-spacing:0.4em;color:var(--gold);text-transform:uppercase;margin-top:8px;opacity:0.9}
-.logo .suit-row{font-size:1.8rem;margin-top:12px;opacity:0.5;letter-spacing:0.3em}
-.home-menu{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px;position:relative;z-index:1}
-.btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:16px 28px;border-radius:var(--radius);border:none;cursor:pointer;font-family:'Rajdhani',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;transition:all 0.2s;position:relative;overflow:hidden}
-.btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.1),transparent);opacity:0;transition:opacity 0.2s}
-.btn:hover::before{opacity:1}
-.btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal2));color:#000;box-shadow:0 4px 20px rgba(0,229,200,0.3)}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(0,229,200,0.5)}
-.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-.btn-secondary:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
-.btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;box-shadow:0 4px 20px rgba(240,180,41,0.3)}
-.btn-gold:hover{transform:translateY(-2px);box-shadow:var(--gold-glow)}
-.btn-danger{background:linear-gradient(135deg,#ff4757,#c0392b);color:#fff}
-.btn-danger:hover{transform:translateY(-2px)}
-.btn-sm{padding:8px 16px;font-size:0.9rem}
-.btn-xs{padding:5px 12px;font-size:0.8rem}
-.btn-icon{padding:8px;border-radius:8px}
-.btn:disabled{opacity:0.4;cursor:not-allowed;transform:none!important}
-
-/* ========== PANELS / MODALS ========== */
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:32px;width:100%;max-width:480px;position:relative;box-shadow:0 0 60px rgba(0,229,200,0.08)}
-.panel-title{font-family:'Cinzel Decorative',serif;font-size:1.3rem;color:var(--teal);margin-bottom:24px;display:flex;align-items:center;gap:10px}
-.panel-title .icon{font-size:1.5rem}
-.form-group{margin-bottom:16px}
-.form-label{display:block;font-size:0.85rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
-.form-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:1rem;outline:none;transition:border-color 0.2s}
-.form-input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,229,200,0.1)}
-select.form-input option{background:var(--surface2)}
-.toggle-row{display:flex;align-items:center;justify-content:space-between}
-.toggle{width:44px;height:24px;background:var(--surface3);border-radius:12px;position:relative;cursor:pointer;transition:background 0.2s;border:none;flex-shrink:0}
-.toggle.on{background:var(--teal)}
-.toggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.2s}
-.toggle.on::after{transform:translateX(20px)}
-.row{display:flex;gap:12px;align-items:center}
-.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px}
-.tab{padding:10px 20px;cursor:pointer;font-weight:600;letter-spacing:0.05em;color:var(--text2);border-bottom:2px solid transparent;transition:all 0.2s}
-.tab.active{color:var(--teal);border-bottom-color:var(--teal)}
-
-/* Full-screen panel screen */
-.panel-screen{flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px}
-
-/* ========== ROOM LIST ========== */
-.room-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding-right:4px}
-.room-list::-webkit-scrollbar{width:4px}
-.room-list::-webkit-scrollbar-track{background:var(--surface2)}
-.room-list::-webkit-scrollbar-thumb{background:var(--teal2);border-radius:2px}
-.room-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:12px}
-.room-item:hover{border-color:var(--teal);background:var(--surface3)}
-.room-item .name{font-weight:700;flex:1}
-.room-item .info{font-size:0.85rem;color:var(--text2)}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:0.75rem;font-weight:700;letter-spacing:0.05em}
-.badge-waiting{background:rgba(0,229,200,0.15);color:var(--teal)}
-.badge-playing{background:rgba(240,180,41,0.15);color:var(--gold)}
-.badge-locked{background:rgba(255,71,87,0.15);color:var(--red)}
-
-/* ========== WAITING ROOM ========== */
-#waitingScreen{flex-direction:row;gap:0}
-.waiting-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;gap:24px}
-.waiting-sidebar{width:280px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:20px;gap:16px}
-.room-title-bar{text-align:center}
-.room-title-bar h2{font-family:'Cinzel Decorative',serif;font-size:1.4rem;color:var(--teal)}
-.room-code-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-family:'Share Tech Mono',monospace;font-size:1.1rem;color:var(--gold);margin-top:8px;cursor:pointer}
-.room-code-badge:hover{border-color:var(--gold)}
-
-/* Circular seating */
-.seat-ring{position:relative;width:340px;height:340px}
-.seat{position:absolute;display:flex;flex-direction:column;align-items:center;gap:6px;transform:translate(-50%,-50%)}
-.seat-avatar{width:64px;height:64px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.6rem;position:relative;transition:all 0.3s}
-.seat-avatar.ready{border-color:var(--green);box-shadow:0 0 14px rgba(46,213,115,0.4)}
-.seat-avatar.host-seat{border-color:var(--gold)}
-.seat-avatar.me{border-color:var(--teal);box-shadow:var(--glow)}
-.seat-avatar .crown{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:0.9rem}
-.seat-name{font-size:0.8rem;font-weight:700;max-width:80px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.seat-status{font-size:0.72rem;font-weight:600;letter-spacing:0.05em}
-.seat-status.ready{color:var(--green)}
-.seat-status.not-ready{color:var(--text3)}
-.seat-empty{opacity:0.3;cursor:pointer}
-.seat-empty:hover .seat-avatar{border-color:var(--teal);opacity:1}
-
-/* Chat */
-.chat-box{flex:1;background:var(--surface2);border-radius:10px;border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column}
-.chat-messages{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:4px;max-height:240px}
-.chat-msg{font-size:0.85rem;line-height:1.4}
-.chat-msg .who{font-weight:700;color:var(--teal)}
-.chat-msg.system{color:var(--text3);font-style:italic}
-.chat-input-row{display:flex;border-top:1px solid var(--border)}
-.chat-input-row input{flex:1;background:transparent;border:none;padding:8px 12px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:0.9rem;outline:none}
-.chat-input-row button{background:var(--teal);border:none;padding:8px 12px;color:#000;cursor:pointer;font-size:0.9rem}
-
-/* ========== GAME TABLE ========== */
-#gameScreen{flex-direction:column;overflow:hidden}
-.game-header{background:var(--surface);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:16px;flex-shrink:0}
-.game-header .title{font-family:'Cinzel Decorative',serif;font-size:1rem;color:var(--teal)}
-.game-header .spacer{flex:1}
-.game-header .room-info{font-size:0.85rem;color:var(--text2)}
-.game-content{flex:1;display:flex;overflow:hidden}
-.game-main{flex:1;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;min-height:0}
-.game-sidebar{width:260px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;padding:16px;gap:12px;overflow:hidden}
-
-/* Table felt */
-.table-felt{position:relative;width:min(580px,90vw);height:min(480px,50vh);background:radial-gradient(ellipse at 50% 50%, #1a3a2a 0%, #0f2218 60%, #0a1a12 100%);border-radius:50%;border:3px solid #2a5a3a;box-shadow:0 0 60px rgba(0,0,0,0.8),inset 0 0 80px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.table-felt::before{content:'';position:absolute;inset:8px;border-radius:50%;border:1px solid rgba(255,255,255,0.05)}
-
-/* Pile */
-.pile-area{display:flex;flex-direction:column;align-items:center;gap:10px}
-.pile-cards{position:relative;width:72px;height:100px}
-.pile-card{position:absolute;inset:0;background:linear-gradient(135deg,#1a4a7a,#0d2a4a);border:1px solid rgba(255,255,255,0.1);border-radius:8px;transition:all 0.3s}
-.pile-card:nth-child(1){transform:rotate(-3deg)}
-.pile-card:nth-child(2){transform:rotate(1deg)}
-.pile-card:nth-child(3){transform:rotate(-1deg)}
-.pile-empty{width:72px;height:100px;border:2px dashed rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:0.8rem}
-.pile-label{font-size:0.8rem;color:var(--text2);text-align:center}
-.pile-count{font-size:1.3rem;font-weight:700;color:var(--text)}
-
-/* Bluff button */
-.bluff-btn{background:linear-gradient(135deg,#ff4757,#c0392b);color:#fff;border:none;padding:14px 32px;border-radius:30px;font-family:'Cinzel Decorative',serif;font-size:1rem;cursor:pointer;font-weight:700;letter-spacing:0.1em;box-shadow:0 0 30px rgba(255,71,87,0.4);transition:all 0.2s;position:relative;overflow:hidden}
-.bluff-btn::before{content:'';position:absolute;inset:-2px;background:linear-gradient(135deg,#ff6b81,#ff4757,#c0392b);border-radius:30px;z-index:-1;opacity:0;transition:opacity 0.2s}
-.bluff-btn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 0 50px rgba(255,71,87,0.7)}
-.bluff-btn.pulse{animation:bluffPulse 1s infinite}
-@keyframes bluffPulse{0%,100%{box-shadow:0 0 30px rgba(255,71,87,0.4)}50%{box-shadow:0 0 60px rgba(255,71,87,0.8)}}
-.bluff-btn:disabled{opacity:0.3;cursor:not-allowed;animation:none}
-
-/* Players at table */
-.table-player{position:absolute;display:flex;flex-direction:column;align-items:center;gap:4px;transform:translate(-50%,-50%)}
-.tp-avatar{width:52px;height:52px;border-radius:50%;background:var(--surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.3rem;position:relative;transition:all 0.3s}
-.tp-avatar.active-turn{border-color:var(--gold);box-shadow:0 0 20px rgba(240,180,41,0.6);animation:activePulse 1.5s infinite}
-@keyframes activePulse{0%,100%{box-shadow:0 0 20px rgba(240,180,41,0.6)}50%{box-shadow:0 0 40px rgba(240,180,41,0.9)}}
-.tp-avatar.me{border-color:var(--teal)}
-.tp-avatar .card-count-badge{position:absolute;top:-6px;right:-6px;background:var(--surface3);border:1px solid var(--border);border-radius:10px;padding:1px 6px;font-size:0.7rem;font-weight:700;font-family:'Share Tech Mono',monospace}
-.tp-name{font-size:0.75rem;font-weight:700;max-width:70px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tp-cards{display:flex;gap:2px;margin-top:2px}
-.tp-card-back{width:14px;height:20px;background:linear-gradient(135deg,#1a4a7a,#0d2a4a);border:1px solid rgba(255,255,255,0.15);border-radius:2px}
-
-/* Turn timer — now lives ABOVE the table */
-.turn-info-wrap{display:flex;justify-content:center;width:100%;padding:6px 0 4px;flex-shrink:0;position:relative;z-index:10}
-.turn-info{background:rgba(8,11,15,0.92);border:1px solid var(--border);border-radius:30px;padding:7px 22px;display:inline-flex;align-items:center;gap:14px;font-size:0.9rem;white-space:nowrap;box-shadow:0 2px 20px rgba(0,0,0,0.5);backdrop-filter:blur(6px)}
-.turn-info .whose-turn{font-weight:700;color:var(--gold)}
-.timer-ring{position:relative;width:28px;height:28px;flex-shrink:0}
-.timer-ring svg{transform:rotate(-90deg)}
-.timer-ring circle{transition:stroke-dashoffset 1s linear}
-.timer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:var(--text)}
-
-/* ========== CARD FLY ANIMATION ========== */
-.flying-card{position:fixed;z-index:500;pointer-events:none;border-radius:6px;box-shadow:0 8px 30px rgba(0,0,0,0.7);transition:none}
-.flying-card-back{background:linear-gradient(135deg,#1a4a7a,#0d2a4a);border:1px solid rgba(255,255,255,0.2);width:44px;height:62px}
-@keyframes flyToTarget{
-  0%  {opacity:1;transform:scale(1) rotate(0deg)}
-  40% {opacity:1;transform:scale(1.15) rotate(var(--fly-rot)) translateY(-10px)}
-  100%{opacity:0;transform:scale(0.5) rotate(calc(var(--fly-rot)*2))}
-}
-@keyframes pileReceive{
-  0%  {transform:scale(1)}
-  30% {transform:scale(1.12)}
-  60% {transform:scale(0.96)}
-  100%{transform:scale(1)}
-}
-.pile-bounce{animation:pileReceive 0.4s ease}
-
-/* ========== CHECK / REVEAL ANIMATION ========== */
-.reveal-overlay{position:fixed;inset:0;z-index:600;display:flex;align-items:center;justify-content:center;pointer-events:none}
-.reveal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,0);animation:revealBG 0.4s ease forwards}
-@keyframes revealBG{to{background:rgba(0,0,0,0.75)}}
-.reveal-spotlight{position:absolute;width:360px;height:260px;background:radial-gradient(ellipse at 50% 50%, rgba(240,180,41,0.15) 0%, transparent 70%);border-radius:50%;animation:spotlightIn 0.5s ease forwards;opacity:0}
-@keyframes spotlightIn{to{opacity:1}}
-.reveal-panel{background:var(--surface);border-radius:20px;padding:28px 36px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 0 80px rgba(240,180,41,0.25);border:1px solid rgba(240,180,41,0.3);opacity:0;transform:scale(0.7) translateY(20px);animation:revealPanelIn 0.45s 0.15s cubic-bezier(0.34,1.56,0.64,1) forwards;position:relative;z-index:1;pointer-events:all}
-@keyframes revealPanelIn{to{opacity:1;transform:scale(1) translateY(0)}}
-.reveal-title{font-family:'Cinzel Decorative',serif;font-size:1rem;color:var(--gold);letter-spacing:0.05em;text-align:center}
-.reveal-cards-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.reveal-card{width:60px;height:84px;border-radius:8px;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:5px;font-weight:700;box-shadow:0 6px 20px rgba(0,0,0,0.5);transform:rotateY(90deg);animation:cardFlip 0.35s ease forwards}
-.reveal-card.red{color:#cc2200}
-.reveal-card.black{color:#111}
-@keyframes cardFlip{to{transform:rotateY(0deg)}}
-.reveal-verdict{font-size:1.1rem;font-weight:700;padding:8px 20px;border-radius:20px;text-align:center}
-.reveal-verdict.lie{background:rgba(255,71,87,0.15);color:var(--red);border:1px solid rgba(255,71,87,0.4)}
-.reveal-verdict.truth{background:rgba(46,213,115,0.15);color:var(--green);border:1px solid rgba(46,213,115,0.4)}
-.reveal-result{font-size:0.9rem;color:var(--text2);text-align:center;max-width:280px}
-
-/* ========== PENALTY CARD-FLY (pile → player) ========== */
-@keyframes penaltyFly{
-  0%  {opacity:1;transform:scale(1)}
-  50% {opacity:1;transform:scale(1.1) translate(var(--px-mid),var(--py-mid))}
-  100%{opacity:0;transform:scale(0.4) translate(var(--px-end),var(--py-end))}
-}
-/* Pile shake when absorbing penalty cards */
-@keyframes pileShake{
-  0%,100%{transform:translateX(0)}
-  20%{transform:translateX(-5px)}
-  40%{transform:translateX(5px)}
-  60%{transform:translateX(-3px)}
-  80%{transform:translateX(3px)}
-}
-/* Player avatar shake when receiving cards */
-@keyframes avatarReceive{
-  0%,100%{transform:translate(-50%,-50%) scale(1)}
-  30%{transform:translate(-50%,-50%) scale(1.25)}
-  60%{transform:translate(-50%,-50%) scale(0.92)}
-}
-.avatar-pop{animation:avatarReceive 0.5s ease}
-
-/* Hand area */
-.hand-area{width:100%;max-width:700px;padding:16px 20px 20px;flex-shrink:0}
-.hand-label{font-size:0.8rem;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
-.hand-cards{display:flex;justify-content:center;min-height:100px;position:relative}
-.card{width:64px;height:90px;border-radius:8px;background:#fff;border:1px solid rgba(0,0,0,0.1);cursor:pointer;position:relative;transition:all 0.2s;display:flex;flex-direction:column;justify-content:space-between;padding:4px;font-size:1rem;font-weight:700;user-select:none;box-shadow:0 4px 12px rgba(0,0,0,0.4);flex-shrink:0;margin:0 -8px}
-.card:first-child{margin-left:0}
-.card:last-child{margin-right:0}
-.card:hover{transform:translateY(-16px) scale(1.05);z-index:10;margin:0 2px}
-.card.selected{transform:translateY(-20px) scale(1.08);border-color:var(--teal);box-shadow:0 0 20px rgba(0,229,200,0.5),0 8px 20px rgba(0,0,0,0.5);z-index:10;margin:0 2px}
-.card.red{color:#cc2200}
-.card.black{color:#111}
-.card .rank-top{font-size:0.85rem;line-height:1;position:absolute;top:4px;left:6px}
-.card .suit-center{font-size:1.6rem;line-height:1;position:absolute;top:50%;left:50%;transform:translate(-50%,-52%)}
-.card .rank-bot{font-size:0.85rem;line-height:1;position:absolute;bottom:4px;right:6px;transform:rotate(180deg)}
-.hand-actions{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:12px;flex-wrap:wrap}
-select.form-input.rank-select{width:auto;padding:8px 14px}
-
-/* Play announcement */
-.last-play{position:absolute;bottom:60px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);border:1px solid var(--border);border-radius:10px;padding:8px 20px;font-size:0.9rem;color:var(--text);text-align:center;pointer-events:none;animation:fadeSlide 0.4s ease}
-@keyframes fadeSlide{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-
-/* Game log */
-.game-log{flex:1;overflow-y:auto;background:var(--surface2);border-radius:8px;border:1px solid var(--border);padding:10px}
-.game-log::-webkit-scrollbar{width:3px}
-.game-log::-webkit-scrollbar-thumb{background:var(--teal2)}
-.log-entry{font-size:0.78rem;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.03);line-height:1.4}
-.log-entry:last-child{border-bottom:none}
-.log-entry.system{color:var(--text3)}
-.log-entry.action{color:var(--text)}
-.log-entry.bluff-caught{color:var(--green)}
-.log-entry.bluff-wrong{color:var(--red)}
-.log-entry.winner{color:var(--gold);font-weight:700}
-
-/* Score / players sidebar */
-.players-list{display:flex;flex-direction:column;gap:6px}
-.pl-item{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px;transition:all 0.2s}
-.pl-item.active{border-color:var(--gold)}
-.pl-item .emoji{font-size:1.2rem}
-.pl-item .info{flex:1}
-.pl-item .pname{font-weight:700;font-size:0.85rem}
-.pl-item .pcards{font-size:0.75rem;color:var(--text2)}
-
-/* Result overlay */
-.result-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;z-index:100;flex-direction:column;gap:20px}
-.result-box{background:var(--surface);border:2px solid var(--gold);border-radius:20px;padding:48px 56px;text-align:center;box-shadow:0 0 80px rgba(240,180,41,0.3)}
-.result-box h2{font-family:'Cinzel Decorative',serif;font-size:2rem;color:var(--gold);margin-bottom:8px}
-.result-box .subtitle{color:var(--text2);font-size:1.1rem;margin-bottom:24px}
-.confetti-item{position:absolute;border-radius:2px;animation:confettiFall 3s ease-in forwards}
-@keyframes confettiFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-
-/* Toast */
-.toast{position:fixed;top:20px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 24px;font-weight:600;z-index:200;animation:toastIn 0.3s ease;pointer-events:none}
-.toast.teal{border-color:var(--teal);color:var(--teal)}
-.toast.gold{border-color:var(--gold);color:var(--gold)}
-.toast.red{border-color:var(--red);color:var(--red)}
-.toast.green{border-color:var(--green);color:var(--green)}
-@keyframes toastIn{from{opacity:0;top:0}to{opacity:1;top:20px}}
-
-/* How to play */
-.howto{max-width:560px}
-.howto h3{font-family:'Cinzel Decorative',serif;font-size:0.95rem;color:var(--gold);margin:16px 0 6px}
-.howto p,.howto li{font-size:0.95rem;color:var(--text2);line-height:1.6}
-.howto ul{padding-left:18px}
-.howto ul li{margin-bottom:4px}
-
-/* Settings */
-.settings-section{margin-bottom:20px}
-.settings-title{font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--text3);margin-bottom:10px;font-weight:700}
-
-/* Diff selector */
-.diff-group{display:flex;gap:8px}
-.diff-btn{flex:1;padding:10px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:0.9rem;color:var(--text2);transition:all 0.2s;text-align:center}
-.diff-btn:hover{border-color:var(--teal);color:var(--teal)}
-.diff-btn.active{background:rgba(0,229,200,0.1);border-color:var(--teal);color:var(--teal)}
-.diff-btn.mixed.active{background:rgba(240,180,41,0.1);border-color:var(--gold);color:var(--gold)}
-
-/* Bot count slider */
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:4px;background:var(--surface3);border-radius:2px;outline:none}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--teal);border-radius:50%;cursor:pointer}
-
-/* Scrollbar */
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:var(--surface)}
-::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--teal2)}
-
-/* Mobile adjustments */
-@media(max-width:680px){
-  #waitingScreen{flex-direction:column}
-  .waiting-sidebar{width:100%;border-left:none;border-top:1px solid var(--border)}
-  .game-sidebar{display:none}
-  .table-felt{width:95vw;height:45vw;min-height:220px}
-  .card{width:48px;height:68px;font-size:0.8rem}
-  .card .suit-center{font-size:1.2rem}
-  .hand-cards{margin:0 -6px}
-  .bluff-btn{padding:10px 20px;font-size:0.85rem}
-}
-</style>
-</head>
-<body>
-
-<!-- ========== HOME SCREEN ========== -->
-<div id="homeScreen" class="screen active">
-  <div class="home-bg" id="homeBg"></div>
-  <div class="logo">
-    <h1>CardArena</h1>
-    <div class="sub">Multiplayer Card Platform</div>
-    <div class="suit-row">♠ ♥ ♦ ♣</div>
-  </div>
-  <div class="home-menu">
-    <button class="btn btn-primary" onclick="showScreen('lobbyScreen')">🌐 Play Online</button>
-    <button class="btn btn-gold" onclick="showScreen('singlePlayerScreen')">🤖 Play vs Bots</button>
-    <button class="btn btn-secondary" onclick="showScreen('howToScreen')">📖 How to Play</button>
-    <button class="btn btn-secondary" onclick="showScreen('settingsScreen')">⚙️ Settings</button>
-  </div>
-</div>
-
-<!-- ========== LOBBY SCREEN ========== -->
-<div id="lobbyScreen" class="screen panel-screen">
-  <div class="panel" style="max-width:520px">
-    <div class="panel-title"><span class="icon">🏟️</span> Online Lobby</div>
-    <div class="tab-bar">
-      <div class="tab active" onclick="lobbyTab('browse',this)">Browse Rooms</div>
-      <div class="tab" onclick="lobbyTab('create',this)">Create Room</div>
-      <div class="tab" onclick="lobbyTab('join',this)">Join by Code</div>
-    </div>
-    <div id="lobbyBrowse">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <span style="color:var(--text2);font-size:0.85rem" id="roomCountLabel">Loading rooms...</span>
-        <button class="btn btn-secondary btn-sm" onclick="refreshRooms()">🔄 Refresh</button>
-      </div>
-      <div class="room-list" id="roomList"></div>
-    </div>
-    <div id="lobbyCreate" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Room Name</label>
-        <input class="form-input" id="createRoomName" placeholder="My Awesome Room" maxlength="30">
-      </div>
-      <div class="row">
-        <div class="form-group" style="flex:1">
-          <label class="form-label">Max Players</label>
-          <select class="form-input" id="createMaxPlayers">
-            <option value="2">2 Players</option>
-            <option value="3">3 Players</option>
-            <option value="4" selected>4 Players</option>
-            <option value="5">5 Players</option>
-            <option value="6">6 Players</option>
-          </select>
-        </div>
-        <div class="form-group" style="flex:1">
-          <label class="form-label">Bot Slots</label>
-          <select class="form-input" id="createBotSlots">
-            <option value="0">0 Bots</option>
-            <option value="1">1 Bot</option>
-            <option value="2">2 Bots</option>
-            <option value="3">3 Bots</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="toggle-row">
-          <label class="form-label" style="margin:0">Private Room</label>
-          <button class="toggle" id="privToggle" onclick="this.classList.toggle('on');document.getElementById('pwdGroup').style.display=this.classList.contains('on')?'block':'none'"></button>
-        </div>
-      </div>
-      <div class="form-group" id="pwdGroup" style="display:none">
-        <label class="form-label">Password</label>
-        <input class="form-input" id="createRoomPwd" type="password" placeholder="Room password">
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="createRoom()">Create Room</button>
-    </div>
-    <div id="lobbyJoin" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Room Code</label>
-        <input class="form-input" id="joinCode" placeholder="Enter 6-character code" maxlength="6" style="font-family:'Share Tech Mono',monospace;font-size:1.2rem;letter-spacing:0.3em;text-transform:uppercase">
-      </div>
-      <div class="form-group" id="joinPwdGroup" style="display:none">
-        <label class="form-label">Password</label>
-        <input class="form-input" id="joinPwd" type="password" placeholder="Room password">
-      </div>
-      <button class="btn btn-primary" style="width:100%" onclick="joinByCode()">Join Room</button>
-    </div>
-  </div>
-  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
-</div>
-
-<!-- ========== SINGLE PLAYER SCREEN ========== -->
-<div id="singlePlayerScreen" class="screen panel-screen">
-  <div class="panel">
-    <div class="panel-title"><span class="icon">🤖</span> Play vs Bots</div>
-    <div class="form-group">
-      <label class="form-label">Number of Bots</label>
-      <div style="display:flex;align-items:center;gap:14px">
-        <input type="range" id="botCount" min="1" max="5" value="3" oninput="document.getElementById('botCountVal').textContent=this.value">
-        <span id="botCountVal" style="font-family:'Share Tech Mono',monospace;font-size:1.2rem;color:var(--teal);min-width:20px">3</span>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Bot Difficulty</label>
-      <div class="diff-group">
-        <div class="diff-btn active" onclick="selectDiff('easy',this)">Easy</div>
-        <div class="diff-btn" onclick="selectDiff('medium',this)">Medium</div>
-        <div class="diff-btn" onclick="selectDiff('hard',this)">Hard</div>
-        <div class="diff-btn mixed" onclick="selectDiff('mixed',this)">Mixed</div>
-      </div>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Your Name</label>
-      <input class="form-input" id="spPlayerName" value="You" maxlength="15">
-    </div>
-    <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="startSinglePlayer()">▶ Start Game</button>
-  </div>
-  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
-</div>
-
-<!-- ========== HOW TO PLAY ========== -->
-<div id="howToScreen" class="screen panel-screen">
-  <div class="panel howto" style="max-width:560px">
-    <div class="panel-title"><span class="icon">📖</span> How to Play Bluff</div>
-    <h3>🎯 Objective</h3>
-    <p>Be the first player to get rid of all your cards.</p>
-    <h3>🃏 Setup</h3>
-    <p>A standard 52-card deck is dealt evenly among all players. Players take turns going clockwise.</p>
-    <h3>🔄 On Your Turn</h3>
-    <ul>
-      <li>Play 1–4 cards face-down onto the center pile</li>
-      <li>Announce the rank you're playing (must follow sequence: A→2→3→...→K→A)</li>
-      <li>You can <strong style="color:var(--red)">lie</strong> — play any cards, but claim any rank</li>
-    </ul>
-    <h3>🚨 Calling Bluff</h3>
-    <ul>
-      <li>Any player can call "BLUFF!" before the next player's turn ends</li>
-      <li>If the last play was a <strong style="color:var(--red)">lie</strong>: the liar takes the entire pile</li>
-      <li>If the last play was <strong style="color:var(--green)">honest</strong>: the challenger takes the pile</li>
-    </ul>
-    <h3>🏆 Winning</h3>
-    <p>The first player to empty their hand wins the round!</p>
-    <h3>💡 Strategy Tips</h3>
-    <ul>
-      <li>Bluff when you have many of the required rank (less suspicious)</li>
-      <li>Challenge when a player plays a suspiciously large number of cards</li>
-      <li>Keep track of cards played — if more than 4 of a rank have been claimed, someone is lying!</li>
-    </ul>
-  </div>
-  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
-</div>
-
-<!-- ========== SETTINGS ========== -->
-<div id="settingsScreen" class="screen panel-screen">
-  <div class="panel">
-    <div class="panel-title"><span class="icon">⚙️</span> Settings</div>
-    <div class="settings-section">
-      <div class="settings-title">Player</div>
-      <div class="form-group">
-        <label class="form-label">Display Name</label>
-        <input class="form-input" id="settingsName" value="Player" maxlength="15">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Avatar</label>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
-          <span id="av0" onclick="selectAvatar(0)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem;border-color:var(--teal)">😎</span>
-          <span id="av1" onclick="selectAvatar(1)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🤠</span>
-          <span id="av2" onclick="selectAvatar(2)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🎭</span>
-          <span id="av3" onclick="selectAvatar(3)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🦊</span>
-          <span id="av4" onclick="selectAvatar(4)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🐱</span>
-          <span id="av5" onclick="selectAvatar(5)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🎩</span>
-        </div>
-      </div>
-    </div>
-    <div class="settings-section">
-      <div class="settings-title">Gameplay</div>
-      <div class="toggle-row" style="margin-bottom:12px">
-        <span style="font-size:0.95rem">Sound Effects</span>
-        <button class="toggle on" id="toggleSound"></button>
-      </div>
-      <div class="toggle-row" style="margin-bottom:12px">
-        <span style="font-size:0.95rem">Animations</span>
-        <button class="toggle on" id="toggleAnim"></button>
-      </div>
-      <div class="toggle-row">
-        <span style="font-size:0.95rem">Auto-ready in Lobby</span>
-        <button class="toggle" id="toggleAutoReady"></button>
-      </div>
-    </div>
-    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="saveSettings()">Save Settings</button>
-  </div>
-  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
-</div>
-
-<!-- ========== WAITING ROOM ========== -->
-<div id="waitingScreen" class="screen">
-  <div class="waiting-main">
-    <div class="room-title-bar">
-      <h2 id="waitRoomName">Room Name</h2>
-      <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-top:8px">
-        <span style="font-size:0.8rem;color:var(--text2)">Room Code:</span>
-        <div class="room-code-badge" onclick="copyRoomCode()" title="Click to copy">
-          <span id="waitRoomCode">ABC123</span>
-          <span>📋</span>
-        </div>
-      </div>
-    </div>
-    <div class="seat-ring" id="seatRing"></div>
-    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-      <button class="btn btn-secondary" id="readyBtn" onclick="toggleReady()">✓ Ready Up</button>
-      <button class="btn btn-primary" id="startGameBtn" style="display:none" onclick="startGame()">▶ Start Game</button>
-      <button class="btn btn-secondary btn-sm" onclick="leaveRoom()">Leave Room</button>
-    </div>
-    <div id="hostControls" style="display:none;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:-8px">
-      <button class="btn btn-secondary btn-sm" id="addBotBtn" onclick="hostAddBot()">+ Add Bot</button>
-      <select class="form-input" id="botDiffSelect" style="width:auto;font-size:0.85rem;padding:6px 10px">
-        <option value="easy">Easy Bot</option>
-        <option value="medium">Medium Bot</option>
-        <option value="hard">Hard Bot</option>
-      </select>
-    </div>
-  </div>
-  <div class="waiting-sidebar">
-    <div style="font-weight:700;font-size:1rem">💬 Chat</div>
-    <div class="chat-box" style="flex:1">
-      <div class="chat-messages" id="waitChat"></div>
-      <div class="chat-input-row">
-        <input id="waitChatInput" placeholder="Say something..." onkeypress="if(event.key==='Enter')sendWaitChat()">
-        <button onclick="sendWaitChat()">➤</button>
-      </div>
-    </div>
-    <div>
-      <div style="font-weight:700;font-size:0.9rem;margin-bottom:8px">Players</div>
-      <div id="waitPlayerList" class="players-list"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ========== GAME SCREEN ========== -->
-<div id="gameScreen" class="screen">
-  <div class="game-header">
-    <span class="title">♠ CardArena — Bluff</span>
-    <span class="spacer"></span>
-    <span class="room-info" id="gameRoomInfo"></span>
-    <button class="btn btn-secondary btn-sm" onclick="confirmLeaveGame()">Leave</button>
-  </div>
-  <div class="game-content">
-    <div class="game-main" id="gameMain">
-      <!-- Turn info lives ABOVE the table -->
-      <div class="turn-info-wrap">
-        <div class="turn-info" id="turnInfo"><span>Waiting...</span></div>
-      </div>
-      <div class="table-felt" id="tableFelt">
-        <!-- Players placed by JS around the table -->
-        <div id="tablePlayers"></div>
-        <!-- Center pile -->
-        <div class="pile-area">
-          <div class="pile-cards" id="pileCards"></div>
-          <div class="pile-label">
-            <div class="pile-count" id="pileCount">0 cards</div>
-            <div id="lastPlayLabel" style="font-size:0.75rem;color:var(--text2)">Pile is empty</div>
-          </div>
-        </div>
-      </div>
-      <!-- Action buttons -->
-      <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap;justify-content:center">
-        <button class="bluff-btn" id="checkBtn" onclick="callCheck()" disabled title="Reveal the last player's cards">🔍 CHECK</button>
-        <button class="btn btn-secondary" id="passBtn" onclick="callPass()" disabled style="padding:12px 28px;font-size:1rem;border-radius:30px">⏭ PASS</button>
-      </div>
-      <!-- Round status strip -->
-      <div id="roundStatusStrip" style="display:none;background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.25);border-radius:8px;padding:6px 18px;font-size:0.85rem;color:var(--gold);margin-top:8px;text-align:center"></div>
-      <!-- Player's hand -->
-      <div class="hand-area">
-        <div class="hand-label">
-          <span>YOUR HAND (<span id="myHandCount">0</span> cards)</span>
-          <span id="myTurnBadge" style="display:none;color:var(--gold);font-weight:700;animation:activePulse 1.5s infinite">YOUR TURN</span>
-        </div>
-        <div class="hand-cards" id="handCards"></div>
-        <div class="hand-actions" id="handActions" style="display:none">
-          <select class="form-input rank-select" id="rankSelect"></select>
-          <button class="btn btn-primary" onclick="playCards()">&#9654; Play</button>
-        </div>
-      </div>
-    </div>
-    <div class="game-sidebar">
-      <div style="font-weight:700;font-size:0.9rem;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase">Players</div>
-      <div class="players-list" id="gamePlayers"></div>
-      <div style="font-weight:700;font-size:0.9rem;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;margin-top:8px">Game Log</div>
-      <div class="game-log" id="gameLog"></div>
-    </div>
-  </div>
-</div>
-
-<script>
 // ============================================================
 // GLOBAL STATE
 // ============================================================
@@ -670,7 +39,6 @@ function showScreen(id) {
 // ============================================================
 (function initHomeBg(){
   const bg = document.getElementById('homeBg');
-  const cards = ['🂡','🂮','🂭','🂫','🃁','🃞','🂱','🃎','🂺','🃊'];
   for(let i=0;i<12;i++){
     const el = document.createElement('div');
     el.className='floating-card';
@@ -714,23 +82,54 @@ function selectDiff(d,el){
 // ============================================================
 function genRoomCode(){return Math.random().toString(36).slice(2,8).toUpperCase()}
 // WebSocket-based multiplayer client (server required at WS_URL)
-let ws = null;
-const WS_URL = localStorage.getItem('cardArenaServer') || 'ws://localhost:3000';
-let serverRooms = {};
 
+let ws = null;
+let serverRooms = {};
+// Dynamically determine WS URL for local/dev/prod
+function getWebSocketUrl() {
+  // Allow override for debugging
+  const override = localStorage.getItem('cardArenaServer');
+  if (override) return override;
+  let protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  let host = window.location.hostname;
+  let port = window.location.port;
+  // If running on Railway or similar, use same host/port as page
+  let wsUrl = protocol + '//' + host + (port ? ':' + port : '') + '/';
+  return wsUrl;
+}
+
+const WS_URL = getWebSocketUrl();
+console.log('Connecting to WebSocket server at', WS_URL);
 function connectToServer(){
   try{
     ws = new WebSocket(WS_URL);
   }catch(e){
     toast('WebSocket init failed','red');
+    showOfflineBanner(true);
     return;
   }
-  ws.onopen = ()=>{ toast('Connected to server','green'); ws.send(JSON.stringify({type:'list_rooms'})); };
-  // identify ourselves so server can map socket -> playerId
-  ws.onopen = ()=>{ toast('Connected to server','green'); ws.send(JSON.stringify({type:'identify', payload:{playerId:myPlayerId, name:settings.name}})); ws.send(JSON.stringify({type:'list_rooms'})); };
+  ws.onopen = ()=>{
+    toast('Connected to server','green');
+    showOfflineBanner(false);
+    ws.send(JSON.stringify({type:'identify', payload:{playerId:myPlayerId, name:settings.name}}));
+    ws.send(JSON.stringify({type:'list_rooms'}));
+  };
   ws.onmessage = (ev)=>{ try{ const msg=JSON.parse(ev.data); handleServerMessage(msg);}catch(e){} };
-  ws.onclose = ()=>{ toast('Disconnected from server — offline mode','gold'); setTimeout(()=>connectToServer(),3000); };
-  ws.onerror = ()=>{ toast('WebSocket error','red'); if(ws)ws.close(); };
+  ws.onclose = ()=>{
+    toast('Disconnected from server — offline mode','gold');
+    showOfflineBanner(true);
+    setTimeout(()=>connectToServer(),3000);
+  };
+  ws.onerror = ()=>{
+    toast('WebSocket error','red');
+    showOfflineBanner(true);
+    if(ws)ws.close();
+  };
+}
+
+function showOfflineBanner(show) {
+  const banner = document.getElementById('offlineBanner');
+  if (banner) banner.style.display = show ? 'block' : 'none';
 }
 
 function handleServerMessage(msg){
@@ -773,11 +172,6 @@ function handleServerMessage(msg){
       // If server notifies we left, clear local state and go home
       if(msg.playerId===myPlayerId){ myRoomId=null; isHost=false; isReady=false; showScreen('homeScreen'); toast('Left room','teal'); }
       else if(msg.room){ rooms[msg.room.id]=msg.room; renderSeats(); renderWaitPlayers(); }
-      break;
-    case 'left_room':
-      if(msg.room && rooms[msg.room.id]) rooms[msg.room.id]=msg.room;
-      if(msg.playerId===myPlayerId){ myRoomId=null; showScreen('homeScreen'); }
-      else { renderSeats(); renderWaitPlayers(); }
       break;
     case 'chat':
       addWaitChat(msg.from||'', msg.text||'', 'action');
@@ -1882,6 +1276,3 @@ if(!settings.name || settings.name==='Player'){
   settings.name = n + Math.floor(Math.random()*90+10);
   document.getElementById('settingsName').value = settings.name;
 }
-</script>
-</body>
-</html>

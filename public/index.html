@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CardArena — Bluff</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="offlineBanner" class="offline-banner">Disconnected from server — offline mode</div>
+
+<!-- ========== HOME SCREEN ========== -->
+<div id="homeScreen" class="screen active">
+  <div class="home-bg" id="homeBg"></div>
+  <div class="logo">
+    <h1>CardArena</h1>
+    <div class="sub">Multiplayer Card Platform</div>
+    <div class="suit-row">♠ ♥ ♦ ♣</div>
+  </div>
+  <div class="home-menu">
+    <button class="btn btn-primary" onclick="showScreen('lobbyScreen')">🌐 Play Online</button>
+    <button class="btn btn-gold" onclick="showScreen('singlePlayerScreen')">🤖 Play vs Bots</button>
+    <button class="btn btn-secondary" onclick="showScreen('howToScreen')">📖 How to Play</button>
+    <button class="btn btn-secondary" onclick="showScreen('settingsScreen')">⚙️ Settings</button>
+  </div>
+</div>
+
+<!-- ========== LOBBY SCREEN ========== -->
+<div id="lobbyScreen" class="screen panel-screen">
+  <div class="panel" style="max-width:520px">
+    <div class="panel-title"><span class="icon">🏟️</span> Online Lobby</div>
+    <div class="tab-bar">
+      <div class="tab active" onclick="lobbyTab('browse',this)">Browse Rooms</div>
+      <div class="tab" onclick="lobbyTab('create',this)">Create Room</div>
+      <div class="tab" onclick="lobbyTab('join',this)">Join by Code</div>
+    </div>
+    <div id="lobbyBrowse">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <span style="color:var(--text2);font-size:0.85rem" id="roomCountLabel">Loading rooms...</span>
+        <button class="btn btn-secondary btn-sm" onclick="refreshRooms()">🔄 Refresh</button>
+      </div>
+      <div class="room-list" id="roomList"></div>
+    </div>
+    <div id="lobbyCreate" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Room Name</label>
+        <input class="form-input" id="createRoomName" placeholder="My Awesome Room" maxlength="30">
+      </div>
+      <div class="row">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">Max Players</label>
+          <select class="form-input" id="createMaxPlayers">
+            <option value="2">2 Players</option>
+            <option value="3">3 Players</option>
+            <option value="4" selected>4 Players</option>
+            <option value="5">5 Players</option>
+            <option value="6">6 Players</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label">Bot Slots</label>
+          <select class="form-input" id="createBotSlots">
+            <option value="0">0 Bots</option>
+            <option value="1">1 Bot</option>
+            <option value="2">2 Bots</option>
+            <option value="3">3 Bots</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="toggle-row">
+          <label class="form-label" style="margin:0">Private Room</label>
+          <button class="toggle" id="privToggle" onclick="this.classList.toggle('on');document.getElementById('pwdGroup').style.display=this.classList.contains('on')?'block':'none'"></button>
+        </div>
+      </div>
+      <div class="form-group" id="pwdGroup" style="display:none">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="createRoomPwd" type="password" placeholder="Room password">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="createRoom()">Create Room</button>
+    </div>
+    <div id="lobbyJoin" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Room Code</label>
+        <input class="form-input" id="joinCode" placeholder="Enter 6-character code" maxlength="6" style="font-family:'Share Tech Mono',monospace;font-size:1.2rem;letter-spacing:0.3em;text-transform:uppercase">
+      </div>
+      <div class="form-group" id="joinPwdGroup" style="display:none">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="joinPwd" type="password" placeholder="Room password">
+      </div>
+      <button class="btn btn-primary" style="width:100%" onclick="joinByCode()">Join Room</button>
+    </div>
+  </div>
+  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
+</div>
+
+<!-- ========== SINGLE PLAYER SCREEN ========== -->
+<div id="singlePlayerScreen" class="screen panel-screen">
+  <div class="panel">
+    <div class="panel-title"><span class="icon">🤖</span> Play vs Bots</div>
+    <div class="form-group">
+      <label class="form-label">Number of Bots</label>
+      <div style="display:flex;align-items:center;gap:14px">
+        <input type="range" id="botCount" min="1" max="5" value="3" oninput="document.getElementById('botCountVal').textContent=this.value">
+        <span id="botCountVal" style="font-family:'Share Tech Mono',monospace;font-size:1.2rem;color:var(--teal);min-width:20px">3</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Bot Difficulty</label>
+      <div class="diff-group">
+        <div class="diff-btn active" onclick="selectDiff('easy',this)">Easy</div>
+        <div class="diff-btn" onclick="selectDiff('medium',this)">Medium</div>
+        <div class="diff-btn" onclick="selectDiff('hard',this)">Hard</div>
+        <div class="diff-btn mixed" onclick="selectDiff('mixed',this)">Mixed</div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Your Name</label>
+      <input class="form-input" id="spPlayerName" value="You" maxlength="15">
+    </div>
+    <button class="btn btn-gold" style="width:100%;margin-top:8px" onclick="startSinglePlayer()">▶ Start Game</button>
+  </div>
+  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
+</div>
+
+<!-- ========== HOW TO PLAY ========== -->
+<div id="howToScreen" class="screen panel-screen">
+  <div class="panel howto" style="max-width:560px">
+    <div class="panel-title"><span class="icon">📖</span> How to Play Bluff</div>
+    <h3>🎯 Objective</h3>
+    <p>Be the first player to get rid of all your cards.</p>
+    <h3>🃏 Setup</h3>
+    <p>A standard 52-card deck is dealt evenly among all players. Players take turns going clockwise.</p>
+    <h3>🔄 On Your Turn</h3>
+    <ul>
+      <li>Play 1–4 cards face-down onto the center pile</li>
+      <li>Announce the rank you're playing (must follow sequence: A→2→3→...→K→A)</li>
+      <li>You can <strong style="color:var(--red)">lie</strong> — play any cards, but claim any rank</li>
+    </ul>
+    <h3>🚨 Calling Bluff</h3>
+    <ul>
+      <li>Any player can call "BLUFF!" before the next player's turn ends</li>
+      <li>If the last play was a <strong style="color:var(--red)">lie</strong>: the liar takes the entire pile</li>
+      <li>If the last play was <strong style="color:var(--green)">honest</strong>: the challenger takes the pile</li>
+    </ul>
+    <h3>🏆 Winning</h3>
+    <p>The first player to empty their hand wins the round!</p>
+    <h3>💡 Strategy Tips</h3>
+    <ul>
+      <li>Bluff when you have many of the required rank (less suspicious)</li>
+      <li>Challenge when a player plays a suspiciously large number of cards</li>
+      <li>Keep track of cards played — if more than 4 of a rank have been claimed, someone is lying!</li>
+    </ul>
+  </div>
+  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
+</div>
+
+<!-- ========== SETTINGS ========== -->
+<div id="settingsScreen" class="screen panel-screen">
+  <div class="panel">
+    <div class="panel-title"><span class="icon">⚙️</span> Settings</div>
+    <div class="settings-section">
+      <div class="settings-title">Player</div>
+      <div class="form-group">
+        <label class="form-label">Display Name</label>
+        <input class="form-input" id="settingsName" value="Player" maxlength="15">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Avatar</label>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <span id="av0" onclick="selectAvatar(0)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem;border-color:var(--teal)">😎</span>
+          <span id="av1" onclick="selectAvatar(1)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🤠</span>
+          <span id="av2" onclick="selectAvatar(2)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🎭</span>
+          <span id="av3" onclick="selectAvatar(3)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🦊</span>
+          <span id="av4" onclick="selectAvatar(4)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🐱</span>
+          <span id="av5" onclick="selectAvatar(5)" class="seat-avatar" style="cursor:pointer;font-size:1.4rem">🎩</span>
+        </div>
+      </div>
+    </div>
+    <div class="settings-section">
+      <div class="settings-title">Gameplay</div>
+      <div class="toggle-row" style="margin-bottom:12px">
+        <span style="font-size:0.95rem">Sound Effects</span>
+        <button class="toggle on" id="toggleSound"></button>
+      </div>
+      <div class="toggle-row" style="margin-bottom:12px">
+        <span style="font-size:0.95rem">Animations</span>
+        <button class="toggle on" id="toggleAnim"></button>
+      </div>
+      <div class="toggle-row">
+        <span style="font-size:0.95rem">Auto-ready in Lobby</span>
+        <button class="toggle" id="toggleAutoReady"></button>
+      </div>
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="saveSettings()">Save Settings</button>
+  </div>
+  <button class="btn btn-secondary btn-sm" onclick="showScreen('homeScreen')">← Back</button>
+</div>
+
+<!-- ========== WAITING ROOM ========== -->
+<div id="waitingScreen" class="screen">
+  <div class="waiting-main">
+    <div class="room-title-bar">
+      <h2 id="waitRoomName">Room Name</h2>
+      <div style="display:flex;align-items:center;gap:8px;justify-content:center;margin-top:8px">
+        <span style="font-size:0.8rem;color:var(--text2)">Room Code:</span>
+        <div class="room-code-badge" onclick="copyRoomCode()" title="Click to copy">
+          <span id="waitRoomCode">ABC123</span>
+          <span>📋</span>
+        </div>
+      </div>
+    </div>
+    <div class="seat-ring" id="seatRing"></div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-secondary" id="readyBtn" onclick="toggleReady()">✓ Ready Up</button>
+      <button class="btn btn-primary" id="startGameBtn" style="display:none" onclick="startGame()">▶ Start Game</button>
+      <button class="btn btn-secondary btn-sm" onclick="leaveRoom()">Leave Room</button>
+    </div>
+    <div id="hostControls" style="display:none;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:-8px">
+      <button class="btn btn-secondary btn-sm" id="addBotBtn" onclick="hostAddBot()">+ Add Bot</button>
+      <select class="form-input" id="botDiffSelect" style="width:auto;font-size:0.85rem;padding:6px 10px">
+        <option value="easy">Easy Bot</option>
+        <option value="medium">Medium Bot</option>
+        <option value="hard">Hard Bot</option>
+      </select>
+    </div>
+  </div>
+  <div class="waiting-sidebar">
+    <div style="font-weight:700;font-size:1rem">💬 Chat</div>
+    <div class="chat-box" style="flex:1">
+      <div class="chat-messages" id="waitChat"></div>
+      <div class="chat-input-row">
+        <input id="waitChatInput" placeholder="Say something..." onkeypress="if(event.key==='Enter')sendWaitChat()">
+        <button onclick="sendWaitChat()">➤</button>
+      </div>
+    </div>
+    <div>
+      <div style="font-weight:700;font-size:0.9rem;margin-bottom:8px">Players</div>
+      <div id="waitPlayerList" class="players-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== GAME SCREEN ========== -->
+<div id="gameScreen" class="screen">
+  <div class="game-header">
+    <span class="title">♠ CardArena — Bluff</span>
+    <span class="spacer"></span>
+    <span class="room-info" id="gameRoomInfo"></span>
+    <button class="btn btn-secondary btn-sm" onclick="confirmLeaveGame()">Leave</button>
+  </div>
+  <div class="game-content">
+    <div class="game-main" id="gameMain">
+      <!-- Turn info lives ABOVE the table -->
+      <div class="turn-info-wrap">
+        <div class="turn-info" id="turnInfo"><span>Waiting...</span></div>
+      </div>
+      <div class="table-felt" id="tableFelt">
+        <!-- Players placed by JS around the table -->
+        <div id="tablePlayers"></div>
+        <!-- Center pile -->
+        <div class="pile-area">
+          <div class="pile-cards" id="pileCards"></div>
+          <div class="pile-label">
+            <div class="pile-count" id="pileCount">0 cards</div>
+            <div id="lastPlayLabel" style="font-size:0.75rem;color:var(--text2)">Pile is empty</div>
+          </div>
+        </div>
+      </div>
+      <!-- Action buttons -->
+      <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap;justify-content:center">
+        <button class="bluff-btn" id="checkBtn" onclick="callCheck()" disabled title="Reveal the last player's cards">🔍 CHECK</button>
+        <button class="btn btn-secondary" id="passBtn" onclick="callPass()" disabled style="padding:12px 28px;font-size:1rem;border-radius:30px">⏭ PASS</button>
+      </div>
+      <!-- Round status strip -->
+      <div id="roundStatusStrip" style="display:none;background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.25);border-radius:8px;padding:6px 18px;font-size:0.85rem;color:var(--gold);margin-top:8px;text-align:center"></div>
+      <!-- Player's hand -->
+      <div class="hand-area">
+        <div class="hand-label">
+          <span>YOUR HAND (<span id="myHandCount">0</span> cards)</span>
+          <span id="myTurnBadge" style="display:none;color:var(--gold);font-weight:700;animation:activePulse 1.5s infinite">YOUR TURN</span>
+        </div>
+        <div class="hand-cards" id="handCards"></div>
+        <div class="hand-actions" id="handActions" style="display:none">
+          <select class="form-input rank-select" id="rankSelect"></select>
+          <button class="btn btn-primary" onclick="playCards()">&#9654; Play</button>
+        </div>
+      </div>
+    </div>
+    <div class="game-sidebar">
+      <div style="font-weight:700;font-size:0.9rem;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase">Players</div>
+      <div class="players-list" id="gamePlayers"></div>
+      <div style="font-weight:700;font-size:0.9rem;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase;margin-top:8px">Game Log</div>
+      <div class="game-log" id="gameLog"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
