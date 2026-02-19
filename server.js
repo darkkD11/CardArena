@@ -4,6 +4,7 @@ const WebSocket = require('ws');
 const path = require('path');
 const gameHandler = require('./lib/game-handler');
 const logger = require('./lib/logger');
+const maintenance = require('./lib/maintenance');
 
 const PORT = process.env.PORT || 3000;
 const CONTEXT = 'Server';
@@ -17,12 +18,30 @@ app.get('/', (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+// Stats endpoint (monitoring)
+app.get('/stats', (req, res) => {
+  const stats = maintenance.getStats(gameHandler);
+  res.json(stats);
+});
+
+// Debug endpoint (internal use only)
+app.get('/debug/cleanup', (req, res) => {
+  const stats = maintenance.cleanupNow(gameHandler);
+  res.json({ message: 'Cleanup triggered', stats });
+});
+
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 server.listen(PORT, () => {
   logger.info(CONTEXT, 'CardArena server started', { port: PORT, type: 'static + WebSocket' });
   gameHandler.startHeartbeat();
+  maintenance.startMaintenance(gameHandler);
 });
 
 // WebSocket connection handling using shared game-handler
@@ -51,6 +70,7 @@ wss.on('connection', (ws) => {
 
 process.on('SIGINT', () => {
   logger.info(CONTEXT, 'Shutting down server');
+  maintenance.stopMaintenance();
   gameHandler.stopHeartbeat();
   server.close(() => {
     logger.info(CONTEXT, 'Server closed');
