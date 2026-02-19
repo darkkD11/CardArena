@@ -3,8 +3,10 @@ const http = require('http');
 const WebSocket = require('ws');
 const path = require('path');
 const gameHandler = require('./lib/game-handler');
+const logger = require('./lib/logger');
 
 const PORT = process.env.PORT || 3000;
+const CONTEXT = 'Server';
 
 const app = express();
 
@@ -19,7 +21,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 server.listen(PORT, () => {
-  console.log('CardArena server (static + WS) running on port', PORT);
+  logger.info(CONTEXT, 'CardArena server started', { port: PORT, type: 'static + WebSocket' });
   gameHandler.startHeartbeat();
 });
 
@@ -32,6 +34,7 @@ wss.on('connection', (ws) => {
     try {
       msg = JSON.parse(raw);
     } catch (e) {
+      logger.debug(CONTEXT, 'Failed to parse JSON message');
       return;
     }
     gameHandler.handleMessage(ws, msg);
@@ -41,11 +44,16 @@ wss.on('connection', (ws) => {
     gameHandler.handleClose(ws);
   });
 
-  ws.on('error', () => {});
+  ws.on('error', (err) => {
+    logger.error(CONTEXT, 'WebSocket error', { error: err.message });
+  });
 });
 
 process.on('SIGINT', () => {
-  console.log('Shutting down');
+  logger.info(CONTEXT, 'Shutting down server');
   gameHandler.stopHeartbeat();
-  server.close(() => process.exit(0));
+  server.close(() => {
+    logger.info(CONTEXT, 'Server closed');
+    process.exit(0);
+  });
 });

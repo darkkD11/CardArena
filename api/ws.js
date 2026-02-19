@@ -4,12 +4,16 @@
  */
 const { Server } = require('ws');
 const gameHandler = require('../lib/game-handler');
+const logger = require('../lib/logger');
+
+const CONTEXT = 'WebSocketHandler';
 
 let wss;
 
 module.exports = (req, res) => {
   if (!wss) {
     wss = new Server({ noServer: true });
+    logger.info(CONTEXT, 'Initializing WebSocket server');
     
     // Reset state for serverless cold starts
     gameHandler.resetState();
@@ -22,6 +26,7 @@ module.exports = (req, res) => {
         try {
           msg = JSON.parse(raw);
         } catch (e) {
+          logger.debug(CONTEXT, 'Failed to parse JSON message');
           return;
         }
         gameHandler.handleMessage(ws, msg);
@@ -31,7 +36,9 @@ module.exports = (req, res) => {
         gameHandler.handleClose(ws);
       });
 
-      ws.on('error', () => {});
+      ws.on('error', (err) => {
+        logger.error(CONTEXT, 'WebSocket error', { error: err.message });
+      });
     });
   }
 
