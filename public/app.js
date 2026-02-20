@@ -1014,10 +1014,10 @@ function showRevealAnimation(cards, claimedRank, wasLie, checkerName, checkedNam
   window._revealCb=callback;
   document.body.appendChild(overlay);
 
-  // Also auto-dismiss after 5s for bots
+  // Also auto-dismiss after 2s for bots
   const autoDismiss=setTimeout(()=>{
     if(overlay.parentNode){overlay.remove();const cb=window._revealCb;window._revealCb=null;cb&&cb();}
-  },5000);
+  },2000);
   overlay.querySelector('button').addEventListener('click',()=>clearTimeout(autoDismiss));
 }
 
