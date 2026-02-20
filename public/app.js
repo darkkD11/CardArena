@@ -549,8 +549,11 @@ function renderTablePlayers(){
   const W=felt.offsetWidth||580, H=felt.offsetHeight||480;
   const cx=W/2, cy=H/2;
   const rx=cx*0.75, ry=cy*0.70;
+  // Rotate the seating so the local player is always at the bottom (angle = +PI/2)
+  const myIdx = G.players.findIndex(p => p.id===myPlayerId);
   G.players.forEach((p,i)=>{
-    const angle=(2*Math.PI*i/n)-Math.PI/2;
+    const rel = myIdx===-1 ? i : (i - myIdx);
+    const angle=(2*Math.PI*rel/n)+Math.PI/2;
     const x=cx+rx*Math.cos(angle);
     const y=cy+ry*Math.sin(angle);
     const isMe=p.id===myPlayerId;
@@ -868,7 +871,9 @@ function getPlayerTablePos(idx){
   const n=G.players.length;
   const cx=fr.left+fr.width/2, cy=fr.top+fr.height/2;
   const rx=fr.width*0.375, ry=fr.height*0.35;
-  const angle=(2*Math.PI*idx/n)-Math.PI/2;
+  const myIdx = G.players.findIndex(p => p.id===myPlayerId);
+  const rel = myIdx===-1 ? idx : (idx - myIdx);
+  const angle=(2*Math.PI*rel/n)+Math.PI/2;
   return {x:cx+rx*Math.cos(angle), y:cy+ry*Math.sin(angle)};
 }
 
