@@ -296,6 +296,10 @@
       <div style="font-weight:700;font-size:0.9rem;margin-top:12px;color:var(--text2);letter-spacing:0.1em;text-transform:uppercase">Chat</div>
       <div class="chat-box" style="margin-top:8px">
         <div class="chat-messages" id="gameChat"></div>
+        <div class="chat-input-row">
+          <input id="gameChatInput" placeholder="Say something..." onkeypress="if(event.key==='Enter')sendGameChat()">
+          <button onclick="sendGameChat()">➤</button>
+        </div>
       </div>
     </div>
   </div>

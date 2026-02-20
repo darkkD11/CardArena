@@ -414,6 +414,20 @@ function sendWaitChat(){
   inp.value='';
 }
 
+// Send a chat message from the in-game chat input
+function sendGameChat(){
+  const inp = document.getElementById('gameChatInput');
+  if(!inp || !inp.value.trim()) return;
+  const text = inp.value.trim();
+  if(ws && ws.readyState===1 && myRoomId){
+    ws.send(JSON.stringify({type:'chat', payload:{roomId:myRoomId, from:settings.name, text}}));
+  } else {
+    // Offline fallback: add to waiting chat (which mirrors to game chat)
+    addWaitChat(settings.name, text, 'action');
+  }
+  inp.value='';
+}
+
 function copyRoomCode(){
   const code=document.getElementById('waitRoomCode').textContent;
   navigator.clipboard.writeText(code).catch(()=>{});
@@ -533,12 +547,6 @@ function initGame(players, starterId, handsMap){
   }
   document.getElementById('gameRoomInfo').textContent=rooms[myRoomId]?rooms[myRoomId].name:'Singleplayer';
   showScreen('gameScreen');
-  // Copy existing waiting-room chat history into game chat when entering a game
-  try{
-    const wc = document.getElementById('waitChat');
-    const gc = document.getElementById('gameChat');
-    if(wc && gc){ gc.innerHTML = wc.innerHTML; gc.scrollTop = gc.scrollHeight; }
-  }catch(e){}
   renderGame();
   startTurn();
 }
