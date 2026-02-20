@@ -394,6 +394,13 @@ function addWaitChat(who,msg,type='action'){
   el.innerHTML=type==='system'?`<em>${esc(msg)}</em>`:`<span class="who">${esc(who)}:</span> ${esc(msg)}`;
   div.appendChild(el);
   div.scrollTop=div.scrollHeight;
+  // Also mirror waiting-room chat into game chat (read-only view in game)
+  const gdiv = document.getElementById('gameChat');
+  if(gdiv){
+    const gel = el.cloneNode(true);
+    gdiv.appendChild(gel);
+    gdiv.scrollTop = gdiv.scrollHeight;
+  }
 }
 function sendWaitChat(){
   const inp=document.getElementById('waitChatInput');
@@ -526,6 +533,12 @@ function initGame(players, starterId, handsMap){
   }
   document.getElementById('gameRoomInfo').textContent=rooms[myRoomId]?rooms[myRoomId].name:'Singleplayer';
   showScreen('gameScreen');
+  // Copy existing waiting-room chat history into game chat when entering a game
+  try{
+    const wc = document.getElementById('waitChat');
+    const gc = document.getElementById('gameChat');
+    if(wc && gc){ gc.innerHTML = wc.innerHTML; gc.scrollTop = gc.scrollHeight; }
+  }catch(e){}
   renderGame();
   startTurn();
 }
